@@ -9,7 +9,7 @@ from regular2Dmesh import *
 from linear2Dshapefun import *
 
 n = 60
-phi = (2*np.pi/n)*np.linspace(0,n,n+1)
+phi = (2.*np.pi/n)*np.linspace(0,n,n+1)
 pv1 = np.transpose(np.array([0.2*np.cos(phi), 0.2*np.sin(phi)]))
 points,tri = pmesh(pv1,0.032,0)
 set1 = (1/3.0)*np.transpose(np.array([points[tri[:,0],0]+points[tri[:,1],0]+points[tri[:,2],0],
@@ -30,12 +30,12 @@ nodes, conn, el1, el2, h1, h2 = regular2Dmesh(L1,h1,L2,h2)
 ##########
 E = 1000.0
 nu = 0.3
-C=(E/((1.+nu)*(1.-2.*nu)))*np.array([[1-nu,nu,0],
-                                     [nu,1-nu,0],
-                                     [0,0,(1-2*nu)/2]])
+C=(E/((1.+nu)*(1.-2.*nu)))*np.array([[1.-nu,nu,0.],
+                                     [nu,1.-nu,0.],
+                                     [0.,0.,(1.-2.*nu)/2.]])
 rho = 1000.0
-v = 0.1
-TOL = 1E-12
+v = 0.1/np.sqrt(2.0)
+TOL = 1E-10
 Vp1 = np.zeros(len(set1))
 Mp1 = np.zeros(len(set1))
 vp1 = np.zeros((len(set1),2))
@@ -72,7 +72,7 @@ n_fi = np.zeros((len(nodes),2))
 # Simulation Parameters:
 deltaT = 0.005
 t = 0.0
-time = 3.6
+time = 2.0
 frame = 100
 X = np.zeros((len(rp),frame))
 Y = np.zeros((len(rp),frame))
@@ -96,7 +96,7 @@ while (t<=time):
         yp = rp[i,1]
         elp1 = np.ceil(xp/h1)
         elp2 = np.floor(yp/h2)
-        el = int(elp2*el1+elp1-1)
+        el = int(elp2*el1+elp1-1.0)
         elNp[i] = el
         el_nodes = nodes[conn[el,:],:]
         xi = (2.0*xp-(el_nodes[0,0]+el_nodes[1,0]))/h1
@@ -131,7 +131,7 @@ while (t<=time):
         for j in range(0,4):
             vl = np.zeros(2)
             if (n_mass[conn[el,j]]>TOL):
-                vp[i,:] += (deltaT*N[j]/n_mass[conn[el,j]])*(n_fi[conn[el,j],:])
+                vp[i,:] += (deltaT*N[j]/n_mass[conn[el,j]])*n_fi[conn[el,j],:]
                 rp[i,:] += (deltaT*N[j]/n_mass[conn[el,j]])*n_momentum[conn[el,j],:]
                 vl = n_momentum[conn[el,j],:]/n_mass[conn[el,j]]
             Lp[0,0] += vl[0]*dNxy[0,j]
@@ -143,16 +143,16 @@ while (t<=time):
         Fp[i,:] = [F[0,0],F[1,0],F[0,1],F[1,1]]
         Vp[i] = np.linalg.det(F)*Vp0[i]
         dEps = (0.5*deltaT)*(Lp+np.transpose(Lp))
-        dSigma = C.dot([dEps[0,0],dEps[1,1],2*dEps[0,1]])
+        dSigma = C.dot(np.array([dEps[0,0],dEps[1,1],2.0*dEps[0,1]]))
         Sp[i,:] += [dSigma[0], dSigma[1], dSigma[2]]
-        Ep[i,:] += [dEps[0,0],dEps[1,1],dEps[0,1]]
+        Ep[i,:] += [dEps[0,0],dEps[1,1],2.0*dEps[0,1]]
     t += deltaT
     n_mass = np.zeros(len(nodes))
     n_momentum = np.zeros((len(nodes),2))
     n_fi = np.zeros((len(nodes),2))
-
+print(Vp)
 plt.figure(figsize=(8,8))
 for i in range(0,len(conn)):
     plt.gca().add_patch(patches.Polygon([[nodes[conn[i,0],0],nodes[conn[i,0],1]],[nodes[conn[i,1],0],nodes[conn[i,1],1]],[nodes[conn[i,2],0],nodes[conn[i,2],1]],[nodes[conn[i,3],0],nodes[conn[i,3],1]]],facecolor='w',edgecolor='k',fill=False))
-plt.scatter(X[:,95],Y[:,95])
+plt.scatter(X[:,-1],Y[:,-1])
 plt.show()
