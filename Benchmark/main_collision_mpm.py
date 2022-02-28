@@ -67,7 +67,6 @@ elNp = np.zeros(len(rp))
 n_mass = np.zeros(len(nodes))
 n_momentum = np.zeros((len(nodes),2))
 n_fi = np.zeros((len(nodes),2))
-print(Mp)
 #############################
 # Simulation Parameters:
 deltaT = 0.005
@@ -108,7 +107,6 @@ while (t<=time):
         dNxy = np.linalg.inv(Jmatrix).dot(dN)
         #dNxy = np.linalg.solve(Jmatrix,dN)
         for j in range(0,4):
-
             n_mass[conn[el,j]] += N[j]*Mp[i]
             n_momentum[conn[el,j],:] += (N[j]*Mp[i])*vp[i,:]
             n_fi[conn[el,j],:] += (-1.0*Vp[i])*np.array([(Sp[i,0]*dNxy[0,j]+Sp[i,2]*dNxy[1,j]),
