@@ -7,6 +7,7 @@ import math
 import matplotlib.pyplot as plt
 from mpi4py import MPI
 from patch import *
+from igafem import *
 
 petsc4py.init(sys.argv)
 
@@ -17,8 +18,7 @@ comm = MPI.COMM_WORLD
 ##############
 # PATCH FAMILY
 ##############
-pf = patchFamily2D('igabem_DR05_4th_768_',2)
+fem = igafem('igabem_DR05_4th_768_',2)
 print("##################")
 print("PATCH FAMILY INFO:")
-print("Number of Patches = ",pf.np)
-print("Hello")
+print("Number of Patches = ",fem.np)
