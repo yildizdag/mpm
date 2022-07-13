@@ -1,11 +1,6 @@
 import numpy as np
-from readPatch2D import *
 
-class bc(readPatch2D):
-    def __init__(self,file_ID):
-        super().__init__(file_ID)
-        self.bcZero_no = []
-        self.bcZero = []
+class bc:
     def zeroDirichlet(self,p_no,axis,cond,coord):
         self.bcZero_no.append(p_no)
         if axis == 'X':
