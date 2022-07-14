@@ -1,6 +1,5 @@
 import numpy as np
 import os.path
-import math
 
 class readPatch2D:
     def __init__(self,file_ID):
